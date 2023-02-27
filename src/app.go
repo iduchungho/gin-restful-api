@@ -15,5 +15,9 @@ func (app *App) Init() {
 }
 
 func (app *App) Run() {
+	if app.r != nil {
 
+	} else {
+		panic("Run time error")
+	}
 }

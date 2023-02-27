@@ -1,6 +1,7 @@
 package database
 
 import (
+	"cse-foodcourt/src/model"
 	"fmt"
 	"os"
 
@@ -9,22 +10,13 @@ import (
 	"gorm.io/gorm"
 )
 
-//	type Database struct {
-//		DB *gorm.DB
-//	}
 var DB *gorm.DB
 
-func creteSchema(db *gorm.DB) {
-	//db.AutoMigrate(&model.User{})
-	//db.AutoMigrate(&model.Document{})
-}
-
-func DatabaseConection() {
+func createDSN() string {
 	errEnv := godotenv.Load()
 	if errEnv != nil {
 		panic("failed to load env file")
 	}
-
 	// Load env properties
 	dbUser := os.Getenv("DB_USER")
 	dbPass := os.Getenv("DB_PASS")
@@ -34,15 +26,37 @@ func DatabaseConection() {
 
 	// mysql", "root:password@tcp(localhost:3306)/testdb
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
-	// fmt.Print(dsn);
+	return dsn
+}
 
+func createSchema(db *gorm.DB) {
+	errDB := db.AutoMigrate(
+		&model.Customer{},
+		&model.Orders{},
+		&model.PaymentDetails{},
+		&model.Menu{},
+		&model.Payment{},
+		&model.Payment{},
+		&model.Restaurant{})
+	if errDB != nil {
+		panic("Database can't create models")
+	}
+}
+
+func DatabaseConection() {
+
+	// crete dsn to database
+	dsn := createDSN()
+
+	// open database
 	db, err := gorm.Open(mysql.Open(dsn))
 	if err != nil {
 		panic(err)
 	}
 
-	// create the schema
-	creteSchema(db)
+	// create schema
+	createSchema(db)
+
 	DB = db
 	fmt.Println("Database Connected")
 
