@@ -1,9 +1,9 @@
 package model
 
 type Restaurant struct {
-	RestaurantID string `gorm:"primaryKey" json:"restaurantID"`
-	Password     string `gorm:"not null" json:"password"`
-	FirstName    string `gorm:"not null" json:"firstName"`
-	LastName     string `gorm:"not null" json:"lastName"`
-	Designation  string `gorm:"not null" json:"designation"`
+	RestaurantID string `gorm:"primaryKey" json:"restaurant_id"`
+	Password     string `gorm:"type:varchar(255);not null" json:"password"`
+	FirstName    string `gorm:"type:varchar(255);not null" json:"first_name"`
+	LastName     string `gorm:"type:varchar(255);not null" json:"last_name"`
+	Designation  string `gorm:"type:varchar(255);not null" json:"designation"`
 }

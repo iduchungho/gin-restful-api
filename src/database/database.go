@@ -4,13 +4,15 @@ import (
 	"cse-foodcourt/src/model"
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
+var lock = &sync.Mutex{}
+var databaseConnection *gorm.DB
 
 func createDSN() string {
 	errEnv := godotenv.Load()
@@ -37,27 +39,43 @@ func createSchema(db *gorm.DB) {
 		&model.Menu{},
 		&model.Payment{},
 		&model.Payment{},
-		&model.Restaurant{})
+		&model.Restaurant{},
+		&model.Comment{})
 	if errDB != nil {
 		panic("Database can't create models")
 	}
 }
 
-func DatabaseConection() {
-
-	// crete dsn to database
+func createConnect() *gorm.DB {
 	dsn := createDSN()
-
-	// open database
 	db, err := gorm.Open(mysql.Open(dsn))
 	if err != nil {
 		panic(err)
 	}
-
-	// create schema
 	createSchema(db)
+	return db
+}
 
-	DB = db
-	fmt.Println("Database Connected")
+/*
+GetConnection
+Design Pattern: Singleton which ensures that
+only one object of its kind exists and provides a single point
+of access to it for any other code.
+*/
+func GetConnection() *gorm.DB {
+	if databaseConnection == nil {
+		lock.Lock()
+		// Ensure that the instance hasn't yet been
+		// initialized by another thread while this one
+		// has been waiting for the lock's release.
+		defer lock.Unlock()
+		if databaseConnection == nil {
+			databaseConnection = createConnect()
+			fmt.Println("Database Connected")
 
+		} else {
+			return databaseConnection
+		}
+	}
+	return databaseConnection
 }

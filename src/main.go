@@ -1,13 +1,13 @@
+/*
+main.go file
+Author: Ho Duc Hung
+Start api: cd /src -> make run or go run main.go app.o
+*/
 package main
 
 func main() {
-
 	// create application
-	var app = new(App)
-
-	// application initialize
-	app.Init()
-
+	app := GetApplication()
 	// app run localhost:8080
 	app.Run()
 }
